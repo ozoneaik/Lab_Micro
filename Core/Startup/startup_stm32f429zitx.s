@@ -56,9 +56,9 @@ defined in linker script */
 
     .section  .text.Reset_Handler
   .weak  Reset_Handler
-  .type  Reset_Handler, %function
+  .type  Reset_Handler, %function //ประกาศ type เป็น reset
 Reset_Handler: 
-  ldr   sp, =_estack       /* set stack pointer */
+  ldr   sp, =_estack       /* set stack pointer */ //โหลด stack โหลดค่า โหลดบร
  
 /* Copy the data segment initializers from flash to SRAM */  
   ldr r0, =_sdata
@@ -68,23 +68,24 @@ Reset_Handler:
   b LoopCopyDataInit
 
 CopyDataInit:
-  ldr r4, [r2, r3]
+  ldr r4, [r2, r3] //gopy r4 to r3
   str r4, [r0, r3]
-  adds r3, r3, #4
-
+  adds r3, r3, #4 //add ทีบะ 4 bye
+//คำนวณตำแหน่ง และgopy ไปเลื่อยๆจนกว่าจะครบ
 LoopCopyDataInit:
   adds r4, r0, r3
   cmp r4, r1
   bcc CopyDataInit
   
 /* Zero fill the bss segment. */
+//ทำการ zero fill
   ldr r2, =_sbss
   ldr r4, =_ebss
   movs r3, #0
   b LoopFillZerobss
 
 FillZerobss:
-  str  r3, [r2]
+  str  r3, [r2] //regis r3 go r2
   adds r2, r2, #4
 
 LoopFillZerobss:
@@ -92,13 +93,13 @@ LoopFillZerobss:
   bcc FillZerobss
 
 /* Call the clock system initialization function.*/
-  bl  SystemInit   
+  bl  SystemInit    //load go to
 /* Call static constructors */
     bl __libc_init_array
 /* Call the application's entry point.*/
-  bl  main
-  bx  lr    
-.size  Reset_Handler, .-Reset_Handler
+  bl  main //load main
+  bx  lr    //ติดลูปตลอดเวลา
+.size  Reset_Handler, .-Reset_Handler //if reset go to interrub
 
 /**
  * @brief  This is the code that gets called when the processor receives an 
@@ -119,16 +120,16 @@ Infinite_Loop:
 * 0x0000.0000.
 * 
 *******************************************************************************/
-   .section  .isr_vector,"a",%progbits
+   .section  .isr_vector,"a",%progbits //การบริการงานประจำจับจังหวะ
   .type  g_pfnVectors, %object
   .size  g_pfnVectors, .-g_pfnVectors
    
 g_pfnVectors:
-  .word  _estack
-  .word  Reset_Handler
+  .word  _estack //address ขั้นอยู่กับตาราง interrub
+  .word  Reset_Handler //เก็ยค่า reset
 
-  .word  NMI_Handler
-  .word  HardFault_Handler
+  .word  NMI_Handler //เป็น inter ที่ไม่สามารภยกเลิกได้,ปกปิด,กัน
+  .word  HardFault_Handler //
   .word  MemManage_Handler
   .word  BusFault_Handler
   .word  UsageFault_Handler
